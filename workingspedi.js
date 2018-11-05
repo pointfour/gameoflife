@@ -11,9 +11,10 @@ init()
 let i = 0
 setInterval(() => {
     if (playing) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
         step()
-        i++;
     }
+    i++;
     if (i == 1000) console.log(1000 / (Date.now() - start) * 1000)
 }, 1)
 function step() {
@@ -23,7 +24,6 @@ function step() {
         canvas.width = side
         canvas.height = side
     }
-    ctx.clearRect(0, 0, side, side)
     cellwidth = side / tilecount
     let nextphase = cells.slice(0)
     for (var y = 0; y < tilecount; y++) {
@@ -34,7 +34,7 @@ function step() {
     }
     cells = nextphase.slice(0)
 }
-function getneighborcount(x, y) {
+function getneighborcount(x, y, debug) {
     let neighborcount = 0
     py = (y + 1) == tilecount ? 0 : y + 1
     my = (y - 1) < 0 ? tilecount - 1 : y - 1
@@ -48,6 +48,7 @@ function getneighborcount(x, y) {
     neighborcount += cells[my * tilecount + mx]
     neighborcount += cells[my * tilecount + x]
     neighborcount += cells[my * tilecount + px]
+    if (debug) console.log(cells[down * tilecount + x], down, x)
     return neighborcount
 }
 function nextvalue(x, y, val) {
@@ -75,13 +76,15 @@ function init() {
     cells = []
     for (let x = 0; x < tilecount; x++) {
         for (let y = 0; y < tilecount; y++) {
-            cells.push(Math.random() >= 0.7)
+            cells.push(Math.random() >= 0.5)
         }
     }
 }
 
 function draw(x, y, age) {
-    ctx.fillStyle = `hsl(120,50%,50%)`
+    if (age == 0) ctx.fillStyle = 'hsl(0,0%,30%)'
+    // else if (age > 241) ctx.fillStyle = `hsla(240,50%,50%,0.1)`
+    else ctx.fillStyle = `hsl(120,50%,50%)`
     if (age) ctx.fillRect(x * cellwidth, y * cellwidth, cellwidth, cellwidth)
 }
 
