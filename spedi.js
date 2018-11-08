@@ -35,35 +35,18 @@ function step() {
     cells = nextphase.slice(0)
 }
 function getneighborcount(x, y) {
-    let neighborcount = 0
     py = (y + 1) == tilecount ? 0 : y + 1
     my = (y - 1) < 0 ? tilecount - 1 : y - 1
     px = (x - 1) < 0 ? tilecount - 1 : x - 1
     mx = (x + 1) == tilecount ? 0 : x + 1
-    neighborcount += cells[py * tilecount + mx]
-    neighborcount += cells[py * tilecount + x]
-    neighborcount += cells[py * tilecount + px]
-    neighborcount += cells[y * tilecount + mx]
-    neighborcount += cells[y * tilecount + px]
-    neighborcount += cells[my * tilecount + mx]
-    neighborcount += cells[my * tilecount + x]
-    neighborcount += cells[my * tilecount + px]
-    return neighborcount
+    return cells[py * tilecount + mx] + cells[py * tilecount + x] + cells[py * tilecount + px] + cells[y * tilecount + mx] + cells[y * tilecount + px] + cells[my * tilecount + mx] + cells[my * tilecount + x] + cells[my * tilecount + px]
 }
-function nextvalue(x, y, val) {
+function nextvalue(x, y, alive) {
     let neighborcount = getneighborcount(x, y);
-    if (val) {
-        if (neighborcount < 2 || neighborcount > 3) {
-            return false
-        } else {
-            return true
-        }
+    if (alive) {
+        return !(neighborcount < 2 || neighborcount > 3)
     } else {
-        if (neighborcount == 3) {
-            return true
-        } else {
-            return false
-        }
+        return neighborcount == 3
     }
 }
 
@@ -73,10 +56,8 @@ function init() {
     canvas.width = side
     canvas.height = side
     cells = []
-    for (let x = 0; x < tilecount; x++) {
-        for (let y = 0; y < tilecount; y++) {
-            cells.push(Math.random() >= 0.7)
-        }
+    for (let x = 0; x < tilecount * tilecount; x++) {
+        cells.push(Math.random() >= 0.7)
     }
 }
 
@@ -88,11 +69,6 @@ function draw(x, y, age) {
 canvas.addEventListener('click', (e) => {
     let y = Math.floor(e.offsetY / cellwidth)
     let x = Math.floor(e.offsetX / cellwidth)
-    if (!e.metaKey) {
-        console.log(x, y, e.offsetX, e.offsetY)
-        cells[y * tilecount + x] = 1
-        draw(x, y, cells[y * tilecount + x])
-    } else {
-        console.log(getneighborcount(x, y), nextvalue(x, y, cells[y * tilecount + x]))
-    }
+    cells[y * tilecount + x] = 1
+    draw(x, y, cells[y * tilecount + x])
 }, false)
